@@ -34,7 +34,7 @@ subj c
     | otherwise = error "SUNRISE ERROR! Invalid Subj: subj function error"
 subjList :: [Char] -> [Subj]
 subjList [] = []
--- subjList (c:cs) = subj c : subjList cs
+
 subjList (c:cs) = go_subjList [] (c:cs)
     where
         go_subjList acc [] = acc
@@ -170,10 +170,7 @@ numOfStudents = length inputStudentList
 
 
 ------------------------- MAKE LONG STRING -------------------------
--- maxLength = length (min (map getIntSubjList list))
-
 makeLongString :: [Student] -> [(Snum, Subj)]
--- go_makeLongString :: [Subj] -> Int -> [Student] -> [[Subj]]
 makeLongString list = go_makeLongString [] 0 list
     where
         go_makeLongString acc i list = if i == minimum (map length (map getIntSubjList list))
@@ -182,28 +179,6 @@ makeLongString list = go_makeLongString [] 0 list
                 where
                     result :: Int -> [Student] -> [(Snum, Subj)]
                     result i list = zip (map getSnum list) (map (!!i) (map getIntSubjList list))
-
-
-{-
-makeLongString :: [Student] -> [Subj]
--- go_makeLongString :: [Subj] -> Int -> [Student] -> [[Subj]]
-makeLongString list = go_makeLongString (subjList []) 0 list
-    where
-        go_makeLongString acc i list = if i == minimum (map length (map getIntSubjList list))
-            then acc
-            else go_makeLongString (acc ++ result (i) list) (i+1) list
-                where
-                    result :: Int -> [Student] -> [Subj]
-                    result i list = map (!!i) (map getIntSubjList list)
--}
-{-
-makeLongString :: [Student] -> [Subj]
--- makeLongString [] = []
-makeLongString (x:xs) = go_makeLongString (subjList "") (x:xs)
-    where
-        go_makeLongString acc [] = acc
-        go_makeLongString acc (x:xs) = go_makeLongString (acc ++ getSubjList (getInputStudent x)) xs
--}
 --------------------------------------------------------------------
 
 
@@ -248,42 +223,6 @@ go_makeAllTimeslots acc_timeslot (t:ts) plists =  if (length(getPlistAcc(last pl
     else go_makeAllTimeslots (acc_timeslot ++ [fst (transformAllPlists t plists)]) ts (snd (transformAllPlists t plists))
 
 
-
-{- WITH INDEX BUT POSSIBLY USELESS
-transformPlist :: Timeslot -> Plist -> (Timeslot, Plist)
-transformPlist timeslot plist = go_transformPlist (fromTamount (getPlistTeacherTotal plist)) 0 timeslot plist
-
-go_transformPlist countdown index timeslot plist = if (isFull timeslot || countdown == 0)
-            then (timeslot, plist)
-            else if currYes timeslot plist
-                then go_transformPlist (countdown-1) (index+1) (addToTimeslot timeslot (head (getPlistAcc plist)) (getPlistSubj plist)) (truncPlist plist)
-                else go_transformPlist countdown (index+1) timeslot (shiftPlist plist)
-truncPlist plist = Plist { getPlistSubj = getPlistSubj plist
-                                 , getPlistTeacherTotal = getPlistTeacherTotal plist
-                                 , getPlistAcc = tail (getPlistAcc plist)
-                                 }
-shiftPlist plist = Plist { getPlistSubj = getPlistSubj plist
-                                 , getPlistTeacherTotal = getPlistTeacherTotal plist
-                                 , getPlistAcc = (tail (getPlistAcc plist)) ++ [head (getPlistAcc plist)]
-                                 }
--}
-
-
-
-
-
-
--------------------------------------------------------------------
-{-
-then go_transformPlist (countdown-1) (index+1) (addToTimeslot timeslot index ((getPlistAcc plist) !! index)) (truncPlist plist)
-                        where
-                            truncPlist plist = Plist { getPlistSubj = getPlistSubj plist
-                                                    , getPlistTeacherTotal = getPlistTeacherTotal plist
-                                                    , getPlistAcc = tail (getPlistAcc plist)
-                                                    }
--}
-
-
 ------------------------- TIMESLOT FUNCTIONS -------------------------
 initTimeslot = Timeslot { getTimeslotMax = subjMax numOfStudents
                         , getTimeslotAcc = subjList "XXXXXXXXXX"
@@ -305,11 +244,6 @@ go_initEmptyTimeslotList acc_initTimeslot timeslot n = go_initEmptyTimeslotList 
 
 emptyTimeslotList = initEmptyTimeslotList 10 initTimeslot
 
-{-
-compInt_SubjMax :: Int -> SubjMax -> Bool
-compInt_SubjMax int sm = (==) int (sm)
--}
-
 isFull :: Timeslot -> Bool
 isFull timeslot = length anyXs == 0
     where
@@ -329,7 +263,6 @@ addToTimeslot timeslot snumber subject = Timeslot { getTimeslotMax = subjMax num
 indexCheck orig timeslot subject index = if (getTimeslotAcc timeslot) !! index == Subj 'X'
                                                             then subject
                                                             else orig
--- getTimeslotAcc = [ indexCheck x timeslot subject (fromSnum (snumber)-1) | x <- getTimeslotAcc timeslot ]
 ----------------------------------------------------------------------
 
 -- TEMP EXECUTION SECTION FOR DEBUGGING
